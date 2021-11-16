@@ -1,0 +1,417 @@
+#include  <ida.idc>
+
+static main()
+{
+	auto sPath, hFile;
+	
+	sPath = "C:\\Users\\charl\\Desktop\\Addresses.cs";
+	hFile = fopen( sPath, "w" );
+	fprintf( hFile, "using System.Reflection;\n\n\n");
+	fprintf( hFile, "namespace LazyLib.Wow\n{\n");
+	fprintf( hFile, "    public class PublicPointers\n    {\n");
+	fprintf( hFile, "        /// <summary>\n        /// Globals\n        /// </summary>\n        public enum Globals\n        {\n" );
+	fprintf( hFile, "            PlayerName = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "0F 28 05 ? ? ? ? 48 8B C1") )+ 0x18 );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// InGame\n        /// </summary>\n        public enum InGame\n        {\n" );
+	fprintf( hFile, "            InGame = 0x%X,//Reversed From Script_IsPlayerInWorld\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "0F B6 05 ? ? ? 01 A8 10 74 ?")  ) );
+	fprintf( hFile, "            LoadingScreen = 0x%X,//Reversed From Script_CanLogIn to CGlueMgr__CanLogIn\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 0D ? ? ? ? 45 33 C9 45 33 C0 B2 ?")  ) );
+	fprintf( hFile, "            RealID = 0x%X, /// Real ID / Name / # \n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 05 ? ? ? ? 48 B9 ? ? ? ? ? ? ? ? 48 89 05 ? ? ? ?")  ) );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+    fprintf( hFile, "     }\n\n" );
+    
+    	fprintf( hFile, "    internal class Pointers\n    {\n");
+    	
+    	fprintf( hFile, "        /// <summary>\n        /// ActionBar\n        /// </summary>\n        internal enum ActionBar\n        {\n" );
+	fprintf( hFile, "            ActionBarFirstSlot = 0x%X,//Reversed From Script_GetActionTexture To CGActionBar__GetTexture\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "4C 8D 35 ? ? ? ? 8D 70 ?")  ) );
+	fprintf( hFile, "            ActionBarBonus =  ActionBarFirstSlot + 0x240,\n" );
+	fprintf( hFile, "            CurrentActionBar = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "3B 1D ? ? ? ? 74 ? 89 1D ? ? ? ? E8 ? ? ? ?")  ) );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Battleground\n        /// </summary>\n        internal enum Battleground\n        {\n" );
+	fprintf( hFile, "            BattlegroundStartTickcount = 0x%X,// GetBattlefieldInstanceRunTime\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 1D ? ? ? ? 48 8B F9 85 DB 74 ? E8 ? ? ? ? 2B C3")  ) );
+	fprintf( hFile, "            Timestamp = 0x%X,////FrameTime__GetCurTimeMs\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 0D ? ? ? ? 48 85 C9 74 ? 4D 8B C8 F3 0F 11 5C 24 ?")  ) +0x24 );
+	fprintf( hFile, "            IsBattlegroundFinished = 0x%X,//GetBattlefieldWinner\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 05 ? ? ? ? 85 C0 74 ? 83 C0 ? 89 05 ? ? ? ? 75 ? E9 ? ? ? ?")  ) -0x8 );
+	fprintf( hFile, "            BattlegroundWinner = 0x%X,// string GetBattlefieldWinner\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 05 ? ? ? ? 85 C0 74 ? 83 C0 ? 89 05 ? ? ? ? 75 ? E9 ? ? ? ?")  )-0x4 );
+	fprintf( hFile, "            BattlegroundInfo = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 0D ? ? ? ? 33 C0 F6 C1 ? 75 ? 8B D0 48 85 C9 75 ? BA ? ? ? ? 85 D2 8B 15 ? ? ? ? 48 0F 44 C1 A8 ? 75 ? 48 85 C0 74 ? 48 8B 48 ? 39 50 ? 74 ? 48 8B C1 EB ? 48 83 78 ? ? 74 ? 48 8B 48 ? 48 8B 01 48 85 C0 74 ? 48 C1 E8 ? 24 ? C3")  ) );
+	fprintf( hFile, "            UISelectedBattlegroundId = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "C6 05 ? ? ? ? ? 48 83 C4 28 C3 C6 05 ? ? ? ? ?")  ) );
+	fprintf( hFile, "        }\n\n" );
+	
+           fprintf( hFile, "        /// <summary>\n        /// Corpse\n        /// </summary>\n        internal enum Corpse\n        {\n" );
+	fprintf( hFile, "            X = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 0D ? ? ? ? 48 89 6C 24 ? 0F 11 05 ? ? ? ?")  ) );
+	fprintf( hFile, "            Y =  X + 0x4,\n" );
+	fprintf( hFile, "            Z =  X + 0x8,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+           fprintf( hFile, "        /// <summary>\n        /// Party\n        /// </summary>\n        internal enum Party\n        {\n" );
+	fprintf( hFile, "            PartyOffset = 0x%X,// every pattern off by 2 idn why - 2 \n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 05 ? ? ? ? 48 85 C0 48 0F 44 05 ? ? ? ? C3")));
+	fprintf( hFile, "            IsInGroupHome = 0x%X,// every pattern off by 2 idn why - 2 \n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 05 ? ? ? ? 48 85 C0 48 0F 44 05 ? ? ? ? C3") ));
+	fprintf( hFile, "            IsInGroupInstance = 0x%X,// every pattern off by 2 idn why - 2\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 0D ? ? ? ? 48 85 C9 48 0F 44 0D ? ? ? ? 33 D2")));
+	fprintf( hFile, "            NumOfPlayers =  0x178,//Script_GetNumGroupMembers\n" );
+	fprintf( hFile, "            NumOfPlayersPattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 81 ? ? ? ? F2 48 0F 2A C8 48 8B CB E8 ? ? ? ? B8 ? ? ? ? 48 83 C4 20 5B " ) + 0x2 ) - 0x4 );
+	fprintf( hFile, "            NumOfPlayers_SuBGroupPattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 81 ? ? ? ? F2 48 0F 2A C8 48 8B CB E8 ? ? ? ? B8 ? ? ? ? 48 83 C4 20 5B " ) + 0x2 ) );
+	fprintf( hFile, "            NumOfPlayers_SuBGroup =  0x17C,//// NumOFPlayers+4\n" );
+	fprintf( hFile, "            PlayerGuid =  0x10,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// AutoLoot\n        /// </summary>\n        internal enum AutoLoot\n        {\n" );
+		fprintf( hFile, "            Pointer = 0x%X,//Reversed From CGGameUI__IsAutoLooting\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 05 ? ? ? ? 48 8B CE 8B 50")  ) );
+	//fprintf( hFile, "            Pointer = 0x%X,//Reversed From CGGameUI__IsAutoLooting\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 05 ? ? ? ? 48 8D 15 ? ? ? ? 48 8B 0D ? ? ? ?")  ) );
+	fprintf( hFile, "            Offset =  0x5C,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// ClickToMove\n        /// </summary>\n        internal enum ClickToMove\n        {\n" );
+	fprintf( hFile, "            Pointer = 0x%X,//Search String in ida Automatically stand when needed to CGGameUI__RegisterGameCVars then thats the offset\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 05 ? ? ? ? 83 78 ? ? 74 ? F6 81 ? ? ? ? ? 75 ? B0 ?")  ) );
+	fprintf( hFile, "            Offset =  0x5C,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Reversed from CGUnit_C__GetCreatureRank \n        /// </summary>\n        internal enum CgUnitCGetCreatureRank\n        {\n" );
+	fprintf( hFile, "            Offset1 =  0x1800, //0x17B8 old,\n" );
+	fprintf( hFile, "            Offset2 =  0x34,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// reversed from CGUnit_C__GetCreatureType \n        /// </summary>\n        internal enum CgUnitCGetCreatureType\n        {\n" );
+	fprintf( hFile, "            Offset1 =  0x1800, //0x17B8 old,\n" );
+	fprintf( hFile, "            Offset2 =  0x30,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+           fprintf( hFile, "        /// <summary>\n        /// reversed from CGWorldFrame__GetActiveCamera\n        /// </summary>\n        internal enum CgWorldFrameGetActiveCamera\n        {\n" );
+	fprintf( hFile, "            CameraPointer = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 1D ? ? ? ? 48 85 DB 74 ? 33 D2")  ) );
+	fprintf( hFile, "            CameraOffset =  0x38E0,// good\n" );
+	fprintf( hFile, "            CameraOffsetPattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 89 ? ? ? ? 48 8B DA 48 85 D2" ) + 0x3 ) );	
+	fprintf( hFile, "            CameraX =  0x10,\n" );
+	fprintf( hFile, "            CameraY =  0x14,\n" );
+	fprintf( hFile, "            CameraZ =  0x18,\n" );
+	fprintf( hFile, "            CameraMatrix =  0x1C,\n" );	
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Search for CGUnit_C::GetSkinnableType_Checked \n        /// </summary>\n        internal enum Skinning\n        {\n" );
+	fprintf( hFile, "            SkinnableFlags1 =  0x1800, // old 0x17B8,\n" );
+	fprintf( hFile, "            SkinnableFlags1Pattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 81 ? ? ? ? 48 85 C0 74 ? 8B 80 ? ? ? ? 0F BA E0 ?" ) + 0x3 ) );
+	fprintf( hFile, "            SkinnableFlags2Pattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 80 ? ? ? ? 0F BA E0 ? 73 ? B8 ? ? ? ?" ) + 0x2 ) );
+	fprintf( hFile, "            SkinnableFlags2 =  0xE8, // old todo test 0x0CC,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// AuctionHouse\n        /// </summary>\n        internal enum AuctionHouse\n        {\n" );
+	fprintf( hFile, "            AuctionListCount = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 05 ? ? ? ? 0F 57 C9 48 8B CB F2 48 0F 2A C8 E8 ? ? ? ? 8B 05 ? ? ? ? 0F 57 C9 48 8B CB F2 48 0F 2A C8 E8 ? ? ? ? 48 8B 7C 24 ?")  ) );
+	fprintf( hFile, "            AuctionList = AuctionListCount + 0x08 ,\n" );
+	fprintf( hFile, "            AuctionOwnerCount = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 05 ? ? ? ? 0F 57 C9 48 8B CB F2 48 0F 2A C8 E8 ? ? ? ? 8B 05 ? ? ? ? EB ? 48 8D 15 ? ? ? ? 48 8B CF E8 ? ? ? ? 85 C0 75 ? 8B 05 ? ? ? ?")  ) );
+	fprintf( hFile, "            AuctionOwnerList = AuctionOwnerCount + 0x08 ,\n" );
+	fprintf( hFile, "            AuctionBidderCount = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 05 ? ? ? ? 0F 57 C9 48 8B CB F2 48 0F 2A C8 E8 ? ? ? ? 8B 05 ? ? ? ? EB ? 48 8D 15 ? ? ? ? 48 8B CF E8 ? ? ? ? 85 C0 75 ? 8B 05 ? ? ? ?")  ) + 0x20 );
+	fprintf( hFile, "            AuctionBidderList = AuctionBidderCount + 0x08 ,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+           fprintf( hFile, "        /// <summary>\n        /// reversed from CGActionBar__IsCurrentAction\n        /// </summary>\n        internal enum AutoAttack\n        {\n" );
+           fprintf( hFile, "            IsAutoRepeatingSpell = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "3B 15 ? ? ? ? 44 89 25 ? ? ? ?")  ) );
+	fprintf( hFile, "            IsInMelee =  0xAF6C,\n" );	
+	fprintf( hFile, "            IsInMelee1 =  0x18A8,\n" );
+	fprintf( hFile, "            AutoAttackFlag =  0xEE8,\n" );
+	fprintf( hFile, "            AutoAttackMask =  0xEEC,\n" );
+	fprintf( hFile, "            ///Address seems to show the GUID of the Auto Attack target\n" );
+	fprintf( hFile, "            AutoAttackGUID =  0xAF6C,\n" );
+	fprintf( hFile, "            ///Shows 0x06 when not wanding, 0x0C or 0x0E when wanding\n" );
+	fprintf( hFile, "            ///Wanding = 0xEF8\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// CastingInfo \n        /// </summary>\n        internal enum CastingInfo\n        {\n" );
+	
+	fprintf( hFile, "            IsCasting2 =  0x19B0,// Script_UnitCastingInfo\n" );
+	fprintf( hFile, "            IsCasting =  0x19B0,// Script_UnitCastingInfo\n" );
+	
+	fprintf( hFile, "            IsCastNotInterruptible =  0x1904,// Script_UnitCastingInfo\n" );
+	
+	fprintf( hFile, "            ChanneledCasting2 =  0x1A08,// Script_UnitCastingInfo\n" );
+	fprintf( hFile, "            ChanneledCasting =  0x19C0,// Script_UnitChannelInfo//prb wrong 0x682 maybe\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+           fprintf( hFile, "        /// <summary>\n        /// reversed from CGWorldFrame__GetActiveCamera\n        /// </summary>\n        internal enum Chat : uint\n        {\n" );
+	fprintf( hFile, "            ChatStart = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 0D ? ? ? ? 41 F7 E8")  ) );
+	fprintf( hFile, "            chatBufferPos = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 0D ? ? ? ? B8 ? ? ? ? 03 CE F7 E9")  ) );
+	fprintf( hFile, "            OffsetToNextMsg =  0xCB8,\n" );
+	fprintf( hFile, "            OffsetToNextMsgPattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 69 D8 ? ? ? ? 48 8D 05 ? ? ? ? 48 03 D8 48 8D 8B ? ? ? ?" ) + 0x3 ) );	
+	fprintf( hFile, "            MsgSenderGuid =  0x00,\n" );
+	fprintf( hFile, "            MsgSenderName =  0x34,\n" );
+	fprintf( hFile, "            MsgFullMessage =  0xE6,\n" );
+	//fprintf( hFile, "            MsgFullMessagePattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "44 0F B6 82 ? ? ? ? 45 84 C0 74 ?" ) + 0x3 ) );
+	fprintf( hFile, "            MsgChatType =  0xCA0,\n" );
+	fprintf( hFile, "            MsgChannelNum =  0xCA4,\n" );	
+	fprintf( hFile, "            MsgTimeStamp =  0xCB0,\n" );	
+	fprintf( hFile, "            ChatQueueDepth =  0x3C,\n" );
+			
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// BlueChat\n        /// </summary>\n        internal enum Messages\n        {\n" );
+	fprintf( hFile, "            EventMessage = 0x%X,//Reversed From CGGameUI__DisplayError\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D ? ? ? ? 01 41 B8 B7 0B ? ? 48 8D ? ? 00 00 00")  ) );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Container\n        /// </summary>\n        internal enum Container\n        {\n" );
+	fprintf( hFile, "            EquippedBagGUID = 0x%X,// GetBagAtIndex \n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 3B 0D ? ? ? ? 75 25 48 8B 05 ? ? ? ? ")  ) );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Globals\n        /// </summary>\n        internal enum Globals\n        {\n" );
+	fprintf( hFile, "            RedMessage = 0x%X,//Reversed From CGGameUI__DisplayError\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D ? ? ? ? 01 41 B8 B7 0B ? ? 48 8D ? ? 00 00 00")  ) );
+	fprintf( hFile, "            MouseOverGUID = 0x%X,// Reversed From Script_GetGUIDFromToken - MouseOver\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "0F 10 05 ? ? ? ? EB ? BA ? ? ? ?")  ) );
+	fprintf( hFile, "            LootWindow = 0x%X,//Reversed From CGPlayer_C_OnLootClose\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "0F B6 15 ? ? ? ? 48 3B C1 0F 42 C8 E8 ? ? ? ? 33 C0 89 05 ? ? ? ?")  ) );
+	fprintf( hFile, "            ChatboxIsOpen = 0x%X,//Reversed From CGPlayer_C_OnLootClose\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 0D ? ? ? ? FF C1 89 0D ? ? ? ? 83 F9 ? 0F 85 ? ? ? ?")  ) );
+	fprintf( hFile, "            CursorType = 0x%X,// Reversed From CursorInitialize - Script_SetCursor To CursorSetMode\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 15 ? ? ? ? E9 ? ? ? ? 48 8D 05 ? ? ? ? 49 8D 89 ? ? ? ?") )- 0x10  );
+	fprintf( hFile, "            CursorType2 = CursorType + 0x04 ,\n" );
+	fprintf( hFile, "            SelectedSpellId = 0x%X,// aka trainer \n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "44 8B 0D ? ? ? ? 4C 8B D1 45 85 C9 75 ?")  ) );
+	fprintf( hFile, "            CGGameUI__m_cursorItem = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "0F 10 05 ? ? ? ? 0F 11 44 24 ? EB ? 33 C0")  ) );
+	fprintf( hFile, "            CGGameUI__m_cursorSpell = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 2D ? ? ? ? 33 F6 8B CD")  ) );
+	fprintf( hFile, "            IsMouseButtonPressed = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "3B 1D ? ? ? ? 44 89 05 ? ? ? ?")  ) );
+	fprintf( hFile, "            Indoors = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "44 0F B6 0D ? ? ? ? 48 8D 05 ? ? ? ? 45 84 C9")  ) );
+	fprintf( hFile, "            IsBobbing = 0x14C ,\n" );
+	fprintf( hFile, "            ArchFacing = 0x198 ,\n" );
+	fprintf( hFile, "            ArchFacingOffset2 = 0x30 ,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+        fprintf( hFile, "        /// <summary>\n        /// KeyBinding // Reversed From Script_GetNumBindings\n        /// </summary>\n        internal enum KeyBinding\n        {\n" );
+	fprintf( hFile, "            NumKeyBindings = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "66 0F 6E 0D ? ? ? ? F3 0F E6 C9 E8 ? ? ? ? B8 ? ? ? ? 48 83 C4 ? C3 ? 40 57 48 83 EC")  ) );
+	fprintf( hFile, "            First =  0x28,// 0x18 hardcoded \n" );	
+	fprintf( hFile, "            Next =  0x18,\n" );
+	fprintf( hFile, "            Key =  0x30,\n" );
+	fprintf( hFile, "            Command =  0x58,// or 0x50\n" );
+	fprintf( hFile, "        }\n\n" );
+	
+
+        fprintf( hFile, "        /// <summary>\n        /// Macros Todo Add Pattern for dumper\n        /// </summary>\n        internal enum MacroManager\n        {\n" );
+	fprintf( hFile, "            Next =  0x8,// currently not using anything besides 0x8 24 + 10 or 20 + 10\n" );
+	fprintf( hFile, "            Name =  0x38,\n" );
+	fprintf( hFile, "            Icon =  0x78,\n" );	
+	fprintf( hFile, "            Body =  0x179,\n" );
+	fprintf( hFile, "            MacroFirst =  0x2CDC918,//40422 MacroBase  4 Below GetRunningMacroButton STring\n" );
+	fprintf( hFile, "            MacroNext  =  0x2CDC908,//40422 MacroBase  4 Below GetRunningMacroButton STring\n" );
+	fprintf( hFile, "            nbGeneralMacros = 0x311C068,// 40422 Found With GetNumMacros String\n" );
+	fprintf( hFile, "            nbSpecificMacros =  0x311C070,//40422 Found With GetNumMacros String\n" );
+	fprintf( hFile, "        }\n\n" );
+
+	fprintf( hFile, "        /// <summary>\n        /// Quest\n        /// </summary>\n        internal enum Quest\n        {\n" );
+	fprintf( hFile, "            m_quests = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "4C 8D 15 ? ? ? ? 85 D2 78 ?")  ) );
+	fprintf( hFile, "            m_numQuests = 0x%X,//Found With GetNumQuestLogEntries String\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "44 8B 05 ? ? ? ? 45 33 C9 41 8B D1")  ) );
+	fprintf( hFile, "            m_currentQuest = 0x%X,//Found In GetQuestID String\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 0D ? ? ? ? 45 33 C0 33 D2 E8 ? ? ? ? 8B 15 ? ? ? ?")  ) );
+	fprintf( hFile, "            m_questTitle = 0x%X,// Found With GetTitleText String pattern might not work\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 05 ? ? ? ? BA ? ? ? ? 74 ?")  ) );
+	fprintf( hFile, "            m_gossipQuests = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 15 ? ? ? ? 45 8B C1 83 7A ? ? 74 ? 8B 02 83 E8 ? 83 F8 ? 77 ?")  ) );
+	fprintf( hFile, "            QuestsCompleted = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "44 8B 35 ? ? ? ? 8B 1D ? ? ? ?")  ) );
+	fprintf( hFile, "            GetNumQuestChoices = 0x%X,//Found WithGetNumQuestChoices String // RewardChoiceItemIdCount\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 0D ? ? ? ? 45 33 C9 85 C9 7E ? 3B D9 7D ? 85 DB 78 ? 48 63 C3")  ) );
+	fprintf( hFile, "            GetQuestReward = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 0D ? ? ? ? 45 33 C9 85 C9 7E ? 3B D9 7D ? 85 DB 78 ? 48 63 C3") ) + 0x8);
+	fprintf( hFile, "            CGQuestInfo_Available__Quest = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B D8 48 85 C0 74 ? 0F B6 48 ?")  ) );
+	fprintf( hFile, "            CGQuestInfo_Available__Num = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "3B 05 ? ? ? ? 73 ? 48 69 D0 ? ? ? ?")  ) );
+	fprintf( hFile, "            CGQuestInfo_Active__Num = 0x%X,//Found With GetNumActiveQuests String\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "3B 3D ? ? ? ? 73 ? 8B C7 48 69 D0 ? ? ? ?")  ) );
+	fprintf( hFile, "            CGQuestInfo_Active__Quest = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 05 ? ? ? ? 48 03 D0 EB ?")  ) );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// ObjectManager\n        /// </summary>\n        internal enum ObjectManager\n        {\n" );
+	fprintf( hFile, "            CurMgrPointer = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "4C 8B 05 ? ? ? ? 45 33 F6")  ) );
+	fprintf( hFile, "            LocalPlayerGUID = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "0F 28 05 ? ? ? ? 48 8B C1")  ) );
+	fprintf( hFile, "            TargetGUID = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 89 05 ? ? ? ? 48 85 C9 74 ? 45 33 C9 48 8D 15 ? ? ? ? 45 8D 41 ? E8 ? ? ? ? 48 8B 0D ? ? ? ?")  ) );
+	fprintf( hFile, "            PetGUID = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "C7 05 ? ? ? ? ? ? ? ? EB ? 41 8B 45 ?")  ) );
+	fprintf( hFile, "            StorageField = 0x10 ,\n" );
+	fprintf( hFile, "            ObjectType = 0x20 ,\n" );
+	fprintf( hFile, "            NextObject = 0x70 ,\n" );
+	fprintf( hFile, "            FirstObject = 0x18 ,\n" );
+	fprintf( hFile, "            LocalGUID = 0x58 ,\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Script_UnitAffectingCombat \n        ///v4 = v2 && (*(_DWORD *)(*(_DWORD *)(v2 + 284) + 316) >> 19) & 1; \n        /// </summary>\n        internal enum InCombat\n        {\n" );
+	
+	fprintf( hFile, "            Mask =  19,\n" );
+	fprintf( hFile, "            Offset2 =  0x158,\n" );
+	fprintf( hFile, "            Offset1 =  0x188,\n" );
+	fprintf( hFile, "            Offset2Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 80 ? ? ? ? 8B 88 ? ? ? ? C1 E9 13 F6 C1 01 " ) + 0x3 ) );
+	fprintf( hFile, "            Offset1Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 80 ? ? ? ? 8B 88 ? ? ? ? C1 E9 13 F6 C1 01 " ) + 0x9 ) );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Runes \n        /// </summary>\n        internal enum Runes\n        {\n" );
+	fprintf( hFile, "            RuneTypes =  0x0,\n" );
+	fprintf( hFile, "            RunesOffset =  0x0,\n" );
+	fprintf( hFile, "            //Offset is usually RuneTypes + 0x64\n" );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// CGUnit_C__GetShapeshiftFormId \n        /// </summary>\n        internal enum ShapeshiftForm\n        {\n" );
+	fprintf( hFile, "            BaseAddressOffset1Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 81 ? ? ? ? 0F B6 80 ? ? ? ? C3" ) + 0x3 ) );
+	fprintf( hFile, "            BaseAddressOffset2Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "0F B6 80 7B 02 00 00 C3" ) + 0x3 ) );
+	fprintf( hFile, "            BaseAddressOffset1 =  0x188,// good\n" );
+	fprintf( hFile, "            BaseAddressOffset2 =  0x27B,// good\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// SpellCooldown\n        /// </summary>\n        internal enum SpellCooldown : uint\n        {\n" );
+	fprintf( hFile, "            CooldPown = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 0D ? ? ? ? 45 0F B6 C1 8B D7")  ) );
+	
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Search for PowerTypePointer  \n        /// </summary>\n        internal enum PowerIndex\n        {\n" );
+	fprintf( hFile, "            PowerIndexArrays = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "41 8B 84 91 ? ? ? ? C3")  ) );
+	fprintf( hFile, "            Multiplicator =  13,// good\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Swimming v5 = v3 && (*(*(v3 + 0x198) + 0x58i64) >> 20) & 1; \n        /// </summary>\n        internal enum Swimming\n        {\n" );
+	fprintf( hFile, "            Pointer =  0x198,\n" );
+	fprintf( hFile, "            Offset =  0x58,\n" );
+	fprintf( hFile, "            Mask =  0x100000,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// IsFlying \n        /// </summary>\n        internal enum IsFlying\n        {\n" );
+	fprintf( hFile, "            Pointer =  0x198,\n" );
+	fprintf( hFile, "            Offset =  0x58,\n" );
+	fprintf( hFile, "            Mask =  0x1000000,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// IsFalling v5 = v3 && (*(*(v3 + 0x198) + 0x58i64) >> 11) & 1 && !((*(*(v3 + 0x198) + 0x58i64) >> 10) & 1);\n        /// </summary>\n        internal enum IsFalling\n        {\n" );
+	fprintf( hFile, "            Pointer =  0x198,\n" );
+	fprintf( hFile, "            Offset =  0x58,\n" );
+	fprintf( hFile, "            Mask =  0x1000000,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// reversed from CGUnit_C__GetAura \n        /// </summary>\n        internal enum UnitAuras : uint\n        {\n" );
+	fprintf( hFile, "            AuraCount1Pattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "3B 91 ? ? 00 00 73 14 8B C2 48 69 D0 ? 00 00 00" ) + 0x2 ) );
+	fprintf( hFile, "            AuraCount2Pattern = 0x%X, // working \n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 81 ? ? 00 00 48 03 C2 C3 " ) + 0x3 ) );
+	fprintf( hFile, "            AuraCount1 =  0x1B20,// fixed 40045\n" );
+	fprintf( hFile, "            AuraCount2 =  0x1B28,// fixed 40045\n" );
+	fprintf( hFile, "            AuraTable1 =  0x1B20,// fixed 40045\n" );
+	fprintf( hFile, "            AuraTable2 =  0x1B28,// fixed 40045\n" );
+	fprintf( hFile, "            AuraSize =  0xB0,\n" );
+	fprintf( hFile, "            AuraSpellId =  0x88,\n" );
+	fprintf( hFile, "            AuraStack =  0x39,\n" );
+	fprintf( hFile, "            TimeLeft =  0x40,\n" );
+	fprintf( hFile, "            OwnerGUID =  0x20,\n" );
+	fprintf( hFile, "            AuraTableOffset =  0x00,\n" );
+	fprintf( hFile, "            AuraFlags =  0x90,\n" );
+	fprintf( hFile, "            AuraLevel =  0x92,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// UnitName \n        /// </summary>\n        internal enum UnitName : uint\n        {\n" );
+	fprintf( hFile, "            ObjectName1Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 81 ? ? ? ? 48 85 C0 74 ? 48 8B 80 ? ? ? ? C3" ) + 0x3 ) );
+	fprintf( hFile, "            ObjectName2Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 80 ? ? ? ? C3 48 8D 05 ? ? ? ?" ) + 0x3 ) );
+	fprintf( hFile, "            ObjectName1 =  0x478,// good\n" );
+	fprintf( hFile, "            ObjectName2 =  0xE0,// good\n" );
+	fprintf( hFile, "            PlayerNameGUIDOffset =  0x20,// dont use atm\n" );
+	fprintf( hFile, "            PlayerNameStringOffset =  0x31,// dont use atm\n" );
+	fprintf( hFile, "            PlayerNameCacheNext =  0x0,// dont use atm\n" );
+	fprintf( hFile, "            PlayerNameCachePointer = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8D 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 3B 45 33 C9")  ) );
+	fprintf( hFile, "            UnitName1 =  0x1800,  //old 0x17B8,\n" );
+	fprintf( hFile, "            UnitName2 =  0xF8, // good\n" );
+	fprintf( hFile, "            UnitName1Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 8B ? ? ? ? 48 85 C9 74 ? 83 B9 ? ? ? ? ? 0F B6 90 ? ? ? ?" ) + 0x3 ) );
+	fprintf( hFile, "            UnitName2Pattern = 0x%X,// working\n", Dword( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 81 ? ? ? ? 48 85 C0 75 ? 48 85 F6" ) + 0x3 ) );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// UnitSpeed \n        /// </summary>\n        internal enum UnitSpeed\n        {\n" );
+	fprintf( hFile, "            Pointer1 =  0x198,\n" );
+	fprintf( hFile, "            Pointer2 =  0xA0,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// WowObject \n        /// </summary>\n        internal enum WowObject\n        {\n" );
+	fprintf( hFile, "            X =  0x15F8,\n" );
+	fprintf( hFile, "            Y =  X + 0x4,\n" );
+	fprintf( hFile, "            Z =  X + 0x8,\n" );
+	fprintf( hFile, "            RotationOffset =  X + 0x10,\n" );
+	fprintf( hFile, "            Pitch =  X + 0x14,\n" );
+	fprintf( hFile, "            GameObjectX =  0x1B0,\n" );
+	fprintf( hFile, "            GameObjectY =  GameObjectX + 0x4,\n" );
+	fprintf( hFile, "            GameObjectZ =  GameObjectX + 0x8,\n" );
+	fprintf( hFile, "            GameObjectRotation =  GameObjectX + 0x10,\n" );
+	fprintf( hFile, "            TransportGUID =  0x15F0,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// Zone \n        /// </summary>\n        internal enum Zone : uint\n        {\n" );
+	fprintf( hFile, "            ZoneText = 0x%X,//Script_GetZoneText\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 2D ? ? ? ? 45 33 FF")  ) );
+	fprintf( hFile, "            ZoneID = 0x%X,//Reversed From Script_GetZonePVPInfo - Script_IsPlayerInMicroDungeon\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 05 ? ? ? ? 3D ? ? ? ? 74 ? 3D ? ? ? ?")  ) );
+	fprintf( hFile, "            SubZoneText = 0x%X,//Reversed From Script_GetSubZoneText\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "4C 8B 0D ? ? ? ? 8B D8")  ) );
+	fprintf( hFile, "            ContinentId = 0x%X,\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "8B 0D ? ? ? ? 48 8B D0 89 0D ? ? ? ? 41 B8 ? ? ? ? 48 8D 0D ? ? ? ? F3 0F 11 35 ? ? ? ? F3 0F 11 3D ? ? ? ? C7 05 ? ? ? ? ? ? ? ? C7 05 ? ? ? ? ? ? ? ? C7 05 ? ? ? ? ? ? ? ? C7 05 ? ? ? ? ? ? ? ? 66 90 0F B6 02 48 FF C2 88 01 48 8D 49 ? 84 C0 74 ? 49 83 E8 ? 75 ? EB ? 4D 85 C0 75 ? C6 01 ? 0F B6 02 48 8D 52 ? 84 C0 75 ? 0F 28 74 24 ? 0F 28 7C 24 ? 48 83 C4 ? C3 C8 ? ? ?")  ) );
+	fprintf( hFile, "            GetContinentIDOffset =  0x00,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+	fprintf( hFile, "        /// <summary>\n        /// UiFrame \n        /// </summary>\n        internal enum UiFrame\n        {\n" );
+	fprintf( hFile, "            ScrWidth = 0x%X,// Script_GetScreenWidth\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "F3 44 0F 59 25 ? ? ? ? F3 44 0F 5E 25 ? ? ? ?")  ) );
+	fprintf( hFile, "            ScrHeight =  ScrWidth + 0x4,\n" );
+	
+	fprintf( hFile, "            FrameBase = 0x%X,// Script_GetMouseMotionFocus\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 0D ? ? ? 02 48 8B D3 84 C0 74 0A")  ) );
+	fprintf( hFile, "            CurrentFramePtr = 0x%X,// Script_GetMouseClickFocus\n", ExtractOffSet( FindBinary( INF_BASEADDR, SEARCH_DOWN, "48 8B 0D ? ? ? 02 48 8B D3 84 C0 74 0A")  ) );
+	fprintf( hFile, "            CurrentFrameOffset =  0x290,\n" );
+	fprintf( hFile, "            FirstFrame =  0xF18,\n" );
+	fprintf( hFile, "            NextFrame =  0xF08,\n" );
+	fprintf( hFile, "            RegionsFirst =  0x2A0,\n" );
+	fprintf( hFile, "            RegionsNext =  0x290,\n" );
+	fprintf( hFile, "            Visible =  0x1CC,\n" );
+	fprintf( hFile, "            Visible1 =  1,\n" );
+	fprintf( hFile, "            Visible2 =  1,\n" );
+	fprintf( hFile, "            LabelText =  0x280,\n" );
+	fprintf( hFile, "            Name =  0x28,\n" );
+	fprintf( hFile, "            FrameBottom =  0x190,\n" );
+	fprintf( hFile, "            FrameLeft =  0x194,\n" );
+	fprintf( hFile, "            FrameTop =  0x198,\n" );
+	fprintf( hFile, "            FrameRight =  0x19C,\n" );
+	fprintf( hFile, "            EffectiveScale =  0x1C0,\n" );
+	fprintf( hFile, "            ParentFrame =  0x58,// 0xD0\n" );
+	fprintf( hFile, "            IconNumber =  0x12,\n" );
+	fprintf( hFile, "            ButtonEnabledPointer =  0x310,\n" );
+	fprintf( hFile, "            ButtonEnabledMask =  0xF,\n" );
+	fprintf( hFile, "            ButtonChecked =  0x360,\n" );
+	fprintf( hFile, "            EditBoxText =  0x330,\n" );
+		
+	fprintf( hFile, "        }\n\n" );
+	
+    fprintf( hFile, "    }\n\n" );
+    fprintf( hFile, "}\n\n" );
+	fclose( hFile );
+
+}
+
+static ExtractOffSet( xRef )
+{
+	auto head, maxLoops;
+	maxLoops = 20;
+	head = (xRef);
+	while ( maxLoops-- )
+	{
+		auto operandValue;
+		
+		if ( head == BADADDR )
+			break;
+
+		operandValue = GetOperandValue( head, 1);
+		if (SegName( operandValue ) == ".data") 
+		{
+			if ( strstr( GetOpnd( head, 0 ), "[" ) > -1 )
+			{
+				break;
+			}
+			
+			return operandValue;
+		}
+		
+		head = ( head );
+	}
+	
+	return 0;
+}
