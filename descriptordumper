@@ -1,0 +1,76 @@
+init_func = 0x1167C80
+func_end = FindFuncEnd(init_func)
+
+curr_head = init_func
+next_head = curr_head
+
+dump_count = 0
+descriptors = []
+
+def dump_descriptors(func_addr):
+  func_end = FindFuncEnd(func_addr)
+  curr_head = func_addr
+  next_head = curr_head
+  
+  results = {}
+  registers = {}
+  
+  opnd_ref = 0
+  opnd_str = None
+  
+  while next_head < func_end:
+    curr_head = next_head
+    next_head = NextHead(curr_head)
+    mnem = GetMnem(curr_head)
+    
+    if (mnem == "lea"):
+      opnd_type = GetOpType(curr_head, 1)
+      opnd_reg = GetOperandValue(curr_head, 0)
+      
+      # Memory Reference eg. lea rdx, unk_14170ED30
+      if (opnd_type == 2):
+        opnd_ref = GetOperandValue(curr_head, 1)
+        opnd_str = GetString(opnd_ref)
+        
+        if (opnd_str == None):
+          registers[opnd_reg] = opnd_ref
+      
+      # Base + Index + Displacement eg. lea rdx, [rdx+18h]
+      elif (opnd_type == 4):
+        descriptor = registers[opnd_reg]
+        if descriptor not in results:
+          results[descriptor] = []
+        
+        results[descriptor].append(opnd_str)
+    
+    elif mnem == "mov":
+      dest_type = GetOpType(curr_head, 0)
+      dest_reg  = GetOperandValue(curr_head, 0)
+      src_type  = GetOpType(curr_head, 1)
+      src_reg   = GetOperandValue(curr_head, 1)
+      
+      if dest_type == 1 and src_type == 1 and src_reg in registers:
+        registers[dest_reg] = registers[src_reg]
+  
+  return results
+
+while next_head < func_end and dump_count < 11:
+  curr_head = next_head
+  next_head = NextHead(curr_head)
+  
+  if GetMnem(curr_head) != "call":
+      continue
+  
+  descriptors_call = GetOperandValue(curr_head, 0)
+  descriptors = dump_descriptors(descriptors_call)
+  
+  # Some functions reference descriptors out of order (eg. CGContainerData.) This means the
+  # first descriptor will reside in negative space. So we need to rebase to the lowest value.
+  addresses = sorted(descriptors)
+  rebase = addresses[0]
+  
+  for address in addresses:
+    offset = (address - rebase) / 0x18
+    print '0x{:04X} {}'.format(offset, descriptors[address])
+  
+  dump_count += 1
